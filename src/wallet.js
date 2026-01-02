@@ -37,7 +37,7 @@ class EthereumWallet {
       address: this.wallet.address,
       privateKey: this.wallet.privateKey,
       mnemonic: mnemonic,
-      publicKey: this.wallet.publicKey
+      publicKey: this.wallet.signingKey.publicKey
     };
   }
 
@@ -53,7 +53,7 @@ class EthereumWallet {
       return {
         address: this.wallet.address,
         privateKey: this.wallet.privateKey,
-        publicKey: this.wallet.publicKey
+        publicKey: this.wallet.signingKey.publicKey
       };
     } catch (error) {
       throw new Error('Invalid private key: ' + error.message);
@@ -77,7 +77,7 @@ class EthereumWallet {
         address: this.wallet.address,
         privateKey: this.wallet.privateKey,
         mnemonic: mnemonic,
-        publicKey: this.wallet.publicKey
+        publicKey: this.wallet.signingKey.publicKey
       };
     } catch (error) {
       throw new Error('Invalid mnemonic: ' + error.message);
@@ -256,7 +256,7 @@ class EthereumWallet {
       
       return {
         address: this.wallet.address,
-        publicKey: this.wallet.publicKey
+        publicKey: this.wallet.signingKey.publicKey
       };
     } catch (error) {
       throw new Error('Failed to decrypt wallet: ' + error.message);
