@@ -1,0 +1,462 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ethereum USDT Wallet Creator</title><style>* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .info-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+        }
+
+        .info-box label {
+            display: block;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .info-box .value {
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .balance-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .balance-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #667eea;
+        }
+
+        .balance-card .label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .balance-card .amount {
+            color: #667eea;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .copy-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin-left: 10px;
+            min-width: auto;
+        }</style><script defer="defer" src="ethereum-usdt-wallet.js"></script></head><body><div class="container"><h1>🔐 Ethereum Wallet Creator</h1><p class="subtitle">Client-Side USDT & ETH Wallet Manager</p><div class="warning"><strong>⚠️ Security Warning:</strong> This wallet runs entirely in your browser. Always backup your private keys and mnemonic phrases securely. Never share them with anyone!</div><div class="section"><h2>Create or Import Wallet</h2><div class="btn-group"><button class="btn-primary" onclick="createNewWallet()">Create New Wallet</button> <button class="btn-secondary" onclick="showImportOptions()">Import Wallet</button></div><div id="importOptions" class="hidden"><div class="input-group"><label>Import from Private Key:</label> <input type="password" id="importPrivateKey" placeholder="Enter private key (0x...)"> <button class="btn-secondary" onclick="importFromPrivateKey()">Import from Private Key</button></div><div class="input-group"><label>Import from Mnemonic:</label> <textarea id="importMnemonic" placeholder="Enter 12 or 24 word mnemonic phrase"></textarea> <button class="btn-secondary" onclick="importFromMnemonic()">Import from Mnemonic</button></div></div></div><div id="walletInfo" class="section hidden"><h2>Wallet Information</h2><div class="info-box"><label>Address:</label><div class="value" id="walletAddress">-</div><button class="btn-secondary copy-btn" onclick="copyToClipboard('walletAddress')">Copy</button></div><div class="info-box"><label>Private Key:</label><div class="value" id="walletPrivateKey">-</div><button class="btn-secondary copy-btn" onclick="copyToClipboard('walletPrivateKey')">Copy</button></div><div class="info-box" id="mnemonicBox"><label>Mnemonic Phrase:</label><div class="value" id="walletMnemonic">-</div><button class="btn-secondary copy-btn" onclick="copyToClipboard('walletMnemonic')">Copy</button></div></div><div id="providerSection" class="section hidden"><h2>Connect to Network</h2><div class="input-group"><label>RPC URL (leave empty for default):</label> <input id="rpcUrl" placeholder="https://eth.llamarpc.com"></div><button class="btn-primary" onclick="connectProvider()">Connect to Network</button></div><div id="balanceSection" class="section hidden"><h2>Balances</h2><button class="btn-success" onclick="refreshBalances()">Refresh Balances</button><div class="balance-display"><div class="balance-card"><div class="label">ETH Balance</div><div class="amount" id="ethBalance">-</div></div><div class="balance-card"><div class="label">USDT Balance</div><div class="amount" id="usdtBalance">-</div></div></div></div><div id="sendSection" class="section hidden"><h2>Send Transaction</h2><div class="btn-group"><button class="btn-primary" onclick="showSendEth()">Send ETH</button> <button class="btn-primary" onclick="showSendUsdt()">Send USDT</button></div><div id="sendEthForm" class="hidden"><h3>Send ETH</h3><div class="input-group"><label>To Address:</label> <input id="ethToAddress" placeholder="0x..."></div><div class="input-group"><label>Amount (ETH):</label> <input id="ethAmount" placeholder="0.01"></div><button class="btn-success" onclick="sendEth()">Send ETH</button></div><div id="sendUsdtForm" class="hidden"><h3>Send USDT</h3><div class="input-group"><label>To Address:</label> <input id="usdtToAddress" placeholder="0x..."></div><div class="input-group"><label>Amount (USDT):</label> <input id="usdtAmount" placeholder="10"></div><button class="btn-success" onclick="sendUsdt()">Send USDT</button></div></div><div id="statusMessage"></div><footer><p>Built with Ethers.js | Client-Side Wallet Creator</p><p style="font-size: 12px; margin-top: 10px;">Always verify transactions and keep your keys secure!</p></footer></div><script>let wallet;
+
+        // Initialize wallet instance
+        function initWallet() {
+            if (typeof EthereumWallet === 'undefined') {
+                showError('EthereumWallet library not loaded!');
+                return null;
+            }
+            if (!wallet) {
+                wallet = new EthereumWallet();
+            }
+            return wallet;
+        }
+
+        // Create new wallet
+        function createNewWallet() {
+            const w = initWallet();
+            if (!w) return;
+
+            try {
+                const walletInfo = w.createNewWallet();
+                displayWalletInfo(walletInfo);
+                showSuccess('New wallet created successfully!');
+            } catch (error) {
+                showError('Error creating wallet: ' + error.message);
+            }
+        }
+
+        // Show import options
+        function showImportOptions() {
+            document.getElementById('importOptions').classList.toggle('hidden');
+        }
+
+        // Import from private key
+        function importFromPrivateKey() {
+            const w = initWallet();
+            if (!w) return;
+
+            const privateKey = document.getElementById('importPrivateKey').value;
+            if (!privateKey) {
+                showError('Please enter a private key');
+                return;
+            }
+
+            try {
+                const walletInfo = w.importFromPrivateKey(privateKey);
+                displayWalletInfo(walletInfo);
+                showSuccess('Wallet imported successfully!');
+                document.getElementById('mnemonicBox').classList.add('hidden');
+            } catch (error) {
+                showError('Error importing wallet: ' + error.message);
+            }
+        }
+
+        // Import from mnemonic
+        function importFromMnemonic() {
+            const w = initWallet();
+            if (!w) return;
+
+            const mnemonic = document.getElementById('importMnemonic').value;
+            if (!mnemonic) {
+                showError('Please enter a mnemonic phrase');
+                return;
+            }
+
+            try {
+                const walletInfo = w.importFromMnemonic(mnemonic);
+                displayWalletInfo(walletInfo);
+                showSuccess('Wallet imported successfully!');
+            } catch (error) {
+                showError('Error importing wallet: ' + error.message);
+            }
+        }
+
+        // Display wallet info
+        function displayWalletInfo(info) {
+            document.getElementById('walletAddress').textContent = info.address;
+            document.getElementById('walletPrivateKey').textContent = info.privateKey;
+            
+            if (info.mnemonic) {
+                document.getElementById('walletMnemonic').textContent = info.mnemonic;
+                document.getElementById('mnemonicBox').classList.remove('hidden');
+            }
+
+            document.getElementById('walletInfo').classList.remove('hidden');
+            document.getElementById('providerSection').classList.remove('hidden');
+        }
+
+        // Connect to provider
+        async function connectProvider() {
+            const w = initWallet();
+            if (!w) return;
+
+            const rpcUrl = document.getElementById('rpcUrl').value || undefined;
+
+            try {
+                w.connectProvider(rpcUrl);
+                showSuccess('Connected to Ethereum network!');
+                document.getElementById('balanceSection').classList.remove('hidden');
+                document.getElementById('sendSection').classList.remove('hidden');
+                await refreshBalances();
+            } catch (error) {
+                showError('Error connecting to network: ' + error.message);
+            }
+        }
+
+        // Refresh balances
+        async function refreshBalances() {
+            const w = initWallet();
+            if (!w) return;
+
+            try {
+                showInfo('Loading balances...');
+                
+                const ethBalance = await w.getEthBalance();
+                const usdtBalance = await w.getUsdtBalance();
+
+                document.getElementById('ethBalance').textContent = parseFloat(ethBalance).toFixed(6);
+                document.getElementById('usdtBalance').textContent = parseFloat(usdtBalance).toFixed(2);
+                
+                showSuccess('Balances updated!');
+            } catch (error) {
+                showError('Error loading balances: ' + error.message);
+            }
+        }
+
+        // Show send ETH form
+        function showSendEth() {
+            document.getElementById('sendEthForm').classList.remove('hidden');
+            document.getElementById('sendUsdtForm').classList.add('hidden');
+        }
+
+        // Show send USDT form
+        function showSendUsdt() {
+            document.getElementById('sendUsdtForm').classList.remove('hidden');
+            document.getElementById('sendEthForm').classList.add('hidden');
+        }
+
+        // Send ETH
+        async function sendEth() {
+            const w = initWallet();
+            if (!w) return;
+
+            const toAddress = document.getElementById('ethToAddress').value;
+            const amount = document.getElementById('ethAmount').value;
+
+            if (!toAddress || !amount) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            try {
+                showInfo('Sending ETH transaction...');
+                const receipt = await w.sendEth(toAddress, amount);
+                showSuccess(`Transaction successful! Hash: ${receipt.hash}`);
+                await refreshBalances();
+            } catch (error) {
+                showError('Error sending ETH: ' + error.message);
+            }
+        }
+
+        // Send USDT
+        async function sendUsdt() {
+            const w = initWallet();
+            if (!w) return;
+
+            const toAddress = document.getElementById('usdtToAddress').value;
+            const amount = document.getElementById('usdtAmount').value;
+
+            if (!toAddress || !amount) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            try {
+                showInfo('Sending USDT transaction...');
+                const receipt = await w.sendUsdt(toAddress, amount);
+                showSuccess(`Transaction successful! Hash: ${receipt.hash}`);
+                await refreshBalances();
+            } catch (error) {
+                showError('Error sending USDT: ' + error.message);
+            }
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess('Copied to clipboard!');
+            }).catch(err => {
+                showError('Failed to copy: ' + err.message);
+            });
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="success">${message}</div>`;
+            setTimeout(() => statusDiv.innerHTML = '', 5000);
+        }
+
+        // Show error message
+        function showError(message) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(() => statusDiv.innerHTML = '', 8000);
+        }
+
+        // Show info message
+        function showInfo(message) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="success">${message}<span class="loading"></span></div>`;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initWallet();
+        });</script></body></html>
