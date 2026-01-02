@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum CDN - Quick Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .example {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .output {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Ethereum Wallet CDN - Quick Examples</h1>
+    
+    <div class="example">
+        <h2>Example 1: Create New Wallet</h2>
+        <button onclick="example1()">Create New Wallet</button>
+        <div id="output1" class="output"></div>
+    </div>
+
+    <div class="example">
+        <h2>Example 2: Import from Private Key</h2>
+        <input type="text" id="privateKey" placeholder="Enter private key" style="width: 100%; padding: 8px; margin: 10px 0;">
+        <button onclick="example2()">Import Wallet</button>
+        <div id="output2" class="output"></div>
+    </div>
+
+    <div class="example">
+        <h2>Example 3: Check Balances</h2>
+        <input type="text" id="address" placeholder="Enter Ethereum address" style="width: 100%; padding: 8px; margin: 10px 0;">
+        <button onclick="example3()">Check Balances</button>
+        <div id="output3" class="output"></div>
+    </div>
+
+    <div class="example">
+        <h2>Example 4: Sign Message</h2>
+        <p><em>First create a wallet using Example 1</em></p>
+        <input type="text" id="message" placeholder="Enter message to sign" style="width: 100%; padding: 8px; margin: 10px 0;">
+        <button onclick="example4()">Sign Message</button>
+        <div id="output4" class="output"></div>
+    </div>
+
+    <!-- Include the Ethereum Wallet CDN -->
+    <script src="./dist/ethereum-usdt-wallet.js"></script>
+
+    <script>
+        let wallet;
+
+        // Example 1: Create new wallet
+        function example1() {
+            wallet = new EthereumWallet();
+            const walletInfo = wallet.createNewWallet();
+            
+            const output = document.getElementById('output1');
+            output.style.display = 'block';
+            output.innerHTML = `
+                <h3>✅ Wallet Created Successfully!</h3>
+                <strong>Address:</strong><br>
+                <code>${walletInfo.address}</code><br><br>
+                
+                <strong>Private Key:</strong><br>
+                <code>${walletInfo.privateKey}</code><br><br>
+                
+                <strong>Mnemonic:</strong><br>
+                <code>${walletInfo.mnemonic}</code><br><br>
+                
+                <strong>Public Key:</strong><br>
+                <code>${walletInfo.publicKey}</code>
+            `;
+        }
+
+        // Example 2: Import from private key
+        function example2() {
+            const privateKey = document.getElementById('privateKey').value;
+            if (!privateKey) {
+                alert('Please enter a private key');
+                return;
+            }
+
+            try {
+                wallet = new EthereumWallet();
+                const walletInfo = wallet.importFromPrivateKey(privateKey);
+                
+                const output = document.getElementById('output2');
+                output.style.display = 'block';
+                output.innerHTML = `
+                    <h3>✅ Wallet Imported Successfully!</h3>
+                    <strong>Address:</strong><br>
+                    <code>${walletInfo.address}</code><br><br>
+                    
+                    <strong>Public Key:</strong><br>
+                    <code>${walletInfo.publicKey}</code>
+                `;
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Example 3: Check balances
+        async function example3() {
+            const address = document.getElementById('address').value;
+            if (!address) {
+                alert('Please enter an Ethereum address');
+                return;
+            }
+
+            try {
+                const output = document.getElementById('output3');
+                output.style.display = 'block';
+                output.innerHTML = '<p>Loading balances... ⏳</p>';
+
+                const checkWallet = new EthereumWallet();
+                checkWallet.connectProvider(); // Use default public RPC
+
+                const ethBalance = await checkWallet.getEthBalance(address);
+                const usdtBalance = await checkWallet.getUsdtBalance(address);
+
+                output.innerHTML = `
+                    <h3>✅ Balances Retrieved!</h3>
+                    <strong>Address:</strong> <code>${address}</code><br><br>
+                    
+                    <strong>ETH Balance:</strong><br>
+                    <code>${parseFloat(ethBalance).toFixed(6)} ETH</code><br><br>
+                    
+                    <strong>USDT Balance:</strong><br>
+                    <code>${parseFloat(usdtBalance).toFixed(2)} USDT</code>
+                `;
+            } catch (error) {
+                document.getElementById('output3').innerHTML = 
+                    `<p style="color: red;">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // Example 4: Sign message
+        async function example4() {
+            if (!wallet) {
+                alert('Please create a wallet first using Example 1');
+                return;
+            }
+
+            const message = document.getElementById('message').value;
+            if (!message) {
+                alert('Please enter a message to sign');
+                return;
+            }
+
+            try {
+                const signature = await wallet.signMessage(message);
+                const signer = wallet.verifyMessage(message, signature);
+
+                const output = document.getElementById('output4');
+                output.style.display = 'block';
+                output.innerHTML = `
+                    <h3>✅ Message Signed!</h3>
+                    <strong>Message:</strong><br>
+                    <code>${message}</code><br><br>
+                    
+                    <strong>Signature:</strong><br>
+                    <code>${signature}</code><br><br>
+                    
+                    <strong>Verified Signer:</strong><br>
+                    <code>${signer}</code>
+                `;
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

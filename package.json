@@ -1,0 +1,34 @@
+{
+  "name": "ethereum-usdt-wallet-cdn",
+  "version": "1.0.0",
+  "description": "Full Ethereum CDN for USDT client-side wallet creator",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "serve": "webpack serve --mode development --open"
+  },
+  "keywords": ["ethereum", "usdt", "wallet", "cdn", "web3"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "html-webpack-plugin": "^5.5.4",
+    "copy-webpack-plugin": "^11.0.0",
+    "crypto-browserify": "^3.12.0",
+    "stream-browserify": "^3.0.0",
+    "assert": "^2.1.0",
+    "stream-http": "^3.2.0",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "url": "^0.11.3",
+    "buffer": "^6.0.3"
+  },
+  "dependencies": {
+    "ethers": "^6.9.0",
+    "bip39": "^3.1.0",
+    "hdkey": "^2.1.0"
+  }
+}
