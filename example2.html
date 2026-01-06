@@ -11,6 +11,9 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/codenlighten/eth-cdn@11e971e/dist/ethereum-usdt-wallet.js" crossorigin="anonymous"></script>
+
     <style>
         :root {
             --primary: #627eea;
@@ -336,8 +339,6 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/gh/codenlighten/eth-cdn@latest/dist/ethereum-usdt-wallet.js"></script>
-
     <script>
         // Store current wallet object
         let currentWallet = null;
@@ -364,6 +365,8 @@
         function generateWallet() {
             const wallet = new EthereumWallet();
             const data = wallet.createNewWallet();
+            // Connect default provider so later signing can auto-fill nonce/chain/fees
+            try { wallet.connectProvider(); } catch (e) {}
             
             currentWallet = wallet;
             currentWalletData = data;
@@ -532,12 +535,18 @@
             }
 
             try {
+                // Ensure provider is connected so missing fields can be inferred
+                if (!currentWallet.provider) {
+                    currentWallet.connectProvider();
+                }
                 const signed = await currentWallet.signEthTransaction(tx);
                 const output = document.getElementById('txOutput');
                 output.style.display = 'block';
                 document.getElementById('signedTxHex').innerText = signed;
             } catch (e) {
-                alert(e.message);
+                const output = document.getElementById('txOutput');
+                output.style.display = 'block';
+                document.getElementById('signedTxHex').innerText = `Error: ${e.message}`;
             }
         }
     </script>
