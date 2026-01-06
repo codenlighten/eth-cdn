@@ -167,6 +167,73 @@ class EthereumWallet {
   }
 
   /**
+   * Sign an ETH transaction (does not broadcast)
+   * @param {Object} tx - Transaction fields ({ to, value, data, gasLimit, nonce, maxFeePerGas, maxPriorityFeePerGas, gasPrice, chainId })
+   * @returns {Promise<string>} Serialized signed transaction (0x...)
+   */
+  async signEthTransaction(tx) {
+    if (!this.wallet) {
+      throw new Error('No wallet loaded');
+    }
+
+    const txRequest = { ...tx };
+
+    // Normalize value if provided as a decimal string
+    if (txRequest.value !== undefined && typeof txRequest.value === 'string') {
+      txRequest.value = ethers.parseEther(txRequest.value);
+    }
+
+    // If no provider, require caller to supply chainId and nonce
+    if (!this.provider) {
+      if (txRequest.chainId === undefined) {
+        throw new Error('chainId is required when provider is not connected');
+      }
+      if (txRequest.nonce === undefined) {
+        throw new Error('nonce is required when provider is not connected');
+      }
+      return await this.wallet.signTransaction(txRequest);
+    }
+
+    // Provider is available: fill in missing fields when possible
+    const network = await this.provider.getNetwork();
+    if (txRequest.chainId === undefined) {
+      txRequest.chainId = network.chainId;
+    }
+
+    if (txRequest.nonce === undefined) {
+      txRequest.nonce = await this.provider.getTransactionCount(this.wallet.address);
+    }
+
+    if (txRequest.gasLimit === undefined) {
+      try {
+        txRequest.gasLimit = await this.provider.estimateGas({
+          from: this.wallet.address,
+          to: txRequest.to,
+          data: txRequest.data,
+          value: txRequest.value
+        });
+      } catch (err) {
+        // If estimation fails, let signing proceed without gas limit
+      }
+    }
+
+    // Populate fee data if caller didn't supply it
+    const hasEip1559Fees = txRequest.maxFeePerGas !== undefined || txRequest.maxPriorityFeePerGas !== undefined;
+    const hasLegacyFee = txRequest.gasPrice !== undefined;
+    if (!hasEip1559Fees && !hasLegacyFee) {
+      const feeData = await this.provider.getFeeData();
+      if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+        txRequest.maxFeePerGas = feeData.maxFeePerGas;
+        txRequest.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+      } else if (feeData.gasPrice) {
+        txRequest.gasPrice = feeData.gasPrice;
+      }
+    }
+
+    return await this.wallet.signTransaction(txRequest);
+  }
+
+  /**
    * Send USDT
    * @param {string} toAddress - Recipient address
    * @param {string} amount - Amount in USDT
