@@ -309,6 +309,31 @@
             </div>
         </div>
 
+        <div class="card">
+            <h2>Sign Raw Transaction</h2>
+            <p style="color: var(--text-muted); margin-bottom: 10px; font-size: 0.9rem;">Produces a signed hex without broadcasting.</p>
+            <div class="input-group"><input type="text" id="txTo" placeholder="To (0x...)" oninput="validateInput(this)"></div>
+            <div class="input-group"><input type="text" id="txValue" placeholder="Value in ETH (e.g. 0.01)"></div>
+            <div class="input-group"><input type="text" id="txData" placeholder="Data (optional 0x...)""></div>
+            <div class="btn-group">
+                <input type="text" id="txGasLimit" placeholder="Gas Limit (optional)" style="flex:1;">
+                <input type="text" id="txNonce" placeholder="Nonce (optional)" style="flex:1;">
+            </div>
+            <div class="btn-group">
+                <input type="text" id="txMaxFee" placeholder="maxFeePerGas (gwei, optional)" style="flex:1;">
+                <input type="text" id="txPriorityFee" placeholder="maxPriorityFeePerGas (gwei, optional)" style="flex:1;">
+            </div>
+            <div class="input-group"><input type="text" id="txGasPrice" placeholder="Legacy gasPrice (gwei, optional)"></div>
+            <div class="input-group"><input type="text" id="txChainId" placeholder="Chain ID (optional if provider connected)"></div>
+            <button class="btn-primary" onclick="signTx()">Sign Transaction (no send)</button>
+            <div id="txOutput" class="output-box">
+                <div class="data-row">
+                    <div class="data-label">Signed Raw TX <span onclick="copyToClipboard('signedTxHex')" style="cursor:pointer; color:var(--primary)">Copy</span></div>
+                    <div class="code-block" id="signedTxHex"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/gh/codenlighten/eth-cdn@latest/dist/ethereum-usdt-wallet.js"></script>
@@ -464,6 +489,54 @@
                     </div>
                 `;
             } catch(e) {
+                alert(e.message);
+            }
+        }
+
+        // --- 6. Raw Transaction Signing (no broadcast) ---
+        async function signTx() {
+            if (!currentWallet) {
+                alert('Please Generate or Import a wallet first (Step 1)');
+                return;
+            }
+
+            const tx = {};
+            const to = document.getElementById('txTo').value.trim();
+            if (to) tx.to = to;
+
+            const value = document.getElementById('txValue').value.trim();
+            if (value) tx.value = value; // library parses to wei
+
+            const data = document.getElementById('txData').value.trim();
+            if (data) tx.data = data;
+
+            const gasLimit = document.getElementById('txGasLimit').value.trim();
+            if (gasLimit) tx.gasLimit = gasLimit;
+
+            const nonce = document.getElementById('txNonce').value.trim();
+            if (nonce) tx.nonce = Number(nonce);
+
+            const chainId = document.getElementById('txChainId').value.trim();
+            if (chainId) tx.chainId = Number(chainId);
+
+            const maxFee = document.getElementById('txMaxFee').value.trim();
+            const maxPriority = document.getElementById('txPriorityFee').value.trim();
+            const gasPrice = document.getElementById('txGasPrice').value.trim();
+
+            // EIP-1559 takes priority if provided
+            if (maxFee || maxPriority) {
+                if (maxFee) tx.maxFeePerGas = ethers.parseUnits(maxFee, 'gwei');
+                if (maxPriority) tx.maxPriorityFeePerGas = ethers.parseUnits(maxPriority, 'gwei');
+            } else if (gasPrice) {
+                tx.gasPrice = ethers.parseUnits(gasPrice, 'gwei');
+            }
+
+            try {
+                const signed = await currentWallet.signEthTransaction(tx);
+                const output = document.getElementById('txOutput');
+                output.style.display = 'block';
+                document.getElementById('signedTxHex').innerText = signed;
+            } catch (e) {
                 alert(e.message);
             }
         }
